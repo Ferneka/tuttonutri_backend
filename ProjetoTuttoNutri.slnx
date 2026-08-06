@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TuttoNutri.API/TuttoNutri.API.csproj" />
+  <Project Path="TuttoNutri.Domain/TuttoNutri.Domain.csproj" />
+  <Project Path="TuttoNutri.Infrastructure/TuttoNutri.Infrastructure.csproj" />
+</Solution>
