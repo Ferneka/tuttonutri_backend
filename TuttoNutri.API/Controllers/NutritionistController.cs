@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuttoNutri.API.Application.Models.Request.NutritionistRequest;
 using TuttoNutri.API.Application.Services.NutritionistService;
+using TuttoNutri.API.Filters;
 
 namespace TuttoNutri.API.Controllers
 {
@@ -43,8 +44,8 @@ namespace TuttoNutri.API.Controllers
 
             return Ok(data);
         }
-
-        [HttpPut("{id}")]
+        [RequireActiveSubscription]
+        [HttpPut()]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Update(UpdateNutritionistRequest request)
@@ -56,7 +57,7 @@ namespace TuttoNutri.API.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete()]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Deactivate(Guid id)

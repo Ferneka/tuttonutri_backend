@@ -14,5 +14,6 @@ namespace TuttoNutri.API.Application.Services.PatientService
         Task<List<PatientDTO>> GetAll(Guid nutritionistId);
         Task<bool> Update(UpdatePatientRequest request, Guid nutritionistId);
         Task<bool> Deactivate(Guid id, Guid nutritionistId);
+        Task<bool> Activate(Guid id, Guid nutritionistId);
     }
 }

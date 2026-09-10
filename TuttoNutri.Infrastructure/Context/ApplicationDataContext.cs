@@ -14,10 +14,14 @@ namespace TuttoNutri.Infrastructure.Context
         public DbSet<Nutritionist> Nutritionist {get; set;}
         // public DbSet<Address> Address {get; set;}
         // public DbSet<Patient> Patient {get; set;}
-        // public DbSet<Consultation> Consultation {get; set;}
-        // public DbSet<FoodPlan> FoodPlan {get; set;}
+        public DbSet<Consultation> Consultation {get; set;}
+        public DbSet<FoodPlan> FoodPlan {get; set;}
         public DbSet<User> User {get; set;}
-        // public DbSet<MedicalRecord> MedicalRecord {get; set;}
+        public DbSet<MedicalRecord> MedicalRecord {get; set;}
+        public DbSet<PasswordResetCode> PasswordResetCodes { get; set; }
+        public DbSet<EmailVerificationCode> EmailVerificationCodes { get; set; }
+        public DbSet<Meal> Meal {get; set;}
+        public DbSet<MealFoodItem> MealFoodItem {get; set;}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDataContext).Assembly);

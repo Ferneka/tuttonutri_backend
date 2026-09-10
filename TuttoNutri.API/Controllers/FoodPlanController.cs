@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TuttoNutri.API.Application.Models.Request.FoodPlanRequest;
 using TuttoNutri.API.Application.Services.FoodPlanService;
+using TuttoNutri.API.Filters;
 
 namespace TuttoNutri.API.Controllers
 {
+    [RequireActiveSubscription]
     public class FoodPlanController : DefaultController 
     {
         private readonly IFoodPlanService _service;
@@ -24,7 +26,7 @@ namespace TuttoNutri.API.Controllers
         {
             var result = await _service.Add(request);
 
-            if (result is false) return BadRequest();
+            if (result is null) return BadRequest(); // mudou: era "result is false"
 
             return Ok(result);
         }

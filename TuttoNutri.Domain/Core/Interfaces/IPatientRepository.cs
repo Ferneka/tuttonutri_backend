@@ -10,5 +10,8 @@ namespace TuttoNutri.Domain.Core.Interfaces
     {
         Task<List<Patient>> GetAll();
         Task DeactivateAsync(Guid id);
+        Task<bool> Activate(Guid id);
+        void Update(Patient patient);
+
     }
 }

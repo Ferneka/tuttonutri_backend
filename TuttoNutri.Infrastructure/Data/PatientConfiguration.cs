@@ -27,24 +27,24 @@ namespace TuttoNutri.Infrastructure.Data
                 .HasMaxLength(20);
 
             builder.Property(p => p.BirthOfDate)
+                .IsRequired()
+                .HasColumnType("date");
+            
+            builder.Property(p => p.Height)
                 .IsRequired();
 
             builder.Property(p => p.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
+            
 
-
-            // builder.HasOne(p => p.Nutritionist)
-            //     //.WithMany(n => n.Patients)
-            //     .HasForeignKey(p => p.NutritionistId)
-            //     .IsRequired()
-            //     .OnDelete(DeleteBehavior.NoAction);  
-
-
-            builder.HasMany(p => p.Consultation)
-                .WithOne(c => c.Patient)
-                .HasForeignKey(c => c.PatientId)
+            builder.HasOne(p => p.Nutritionist)
+                .WithMany(n => n.Patients)  // agora referenciando a coleção
+                .HasForeignKey(p => p.NutritionistId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);
+
+          
 
         }
     }

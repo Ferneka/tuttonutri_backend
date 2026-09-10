@@ -17,15 +17,11 @@ namespace TuttoNutri.API.Application.Models.ViewModel.ViewModelExtension
             {
                 Id = DTO.Id,
                 Name = DTO.Name,
-                Email = DTO.Email,
                 Phone = DTO.Phone,
                 Gender = DTO.Gender,
                 BirthOfDate = DTO.BirthOfDate,
-                Weight = DTO.Weight,
                 Height = DTO.Height,
-                Objective = DTO.Objective,
                 IsActive = DTO.IsActive,
-                Address = DTO.Address.ToViewModel()
             };
         }
     }

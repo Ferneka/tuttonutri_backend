@@ -11,5 +11,8 @@ namespace TuttoNutri.Domain.Core.Interfaces
         Task<List<Nutritionist>> GetAll();
         Task DeactivateAsync(Guid id);
         Task<Nutritionist> GetByUserId(string userId);
+        Task<Nutritionist> GetByCrn(string crn);
+        void Update(Nutritionist nutritionist);
+        
     }
 }

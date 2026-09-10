@@ -204,30 +204,23 @@ namespace TuttoNutri.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<int>("MinuteDuration")
-                        .HasColumnType("integer");
-
                     b.Property<Guid>("NutritionistId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Observations")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -236,6 +229,31 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("Consultation", (string)null);
+                });
+
+            modelBuilder.Entity("TuttoNutri.Domain.Models.EmailVerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailVerificationCodes");
                 });
 
             modelBuilder.Entity("TuttoNutri.Domain.Models.FoodPlan", b =>
@@ -251,13 +269,16 @@ namespace TuttoNutri.Infrastructure.Migrations
                         .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<double>("Fat")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<double>("Fiber")
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<DateTime>("InitDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -291,6 +312,82 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.ToTable("FoodPlan", (string)null);
                 });
 
+            modelBuilder.Entity("TuttoNutri.Domain.Models.Meal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FoodPlanId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<TimeSpan?>("Time")
+                        .HasColumnType("interval");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodPlanId");
+
+                    b.ToTable("Meal", (string)null);
+                });
+
+            modelBuilder.Entity("TuttoNutri.Domain.Models.MealFoodItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("CarbohydratePer100g")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<double>("FatPer100g")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double>("FiberPer100g")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double>("Grams")
+                        .HasColumnType("decimal(7,2)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<double>("KcalPer100g")
+                        .HasColumnType("decimal(7,2)");
+
+                    b.Property<Guid>("MealId")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("ProteinPer100g")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("TacoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MealId");
+
+                    b.ToTable("MealFoodItem", (string)null);
+                });
+
             modelBuilder.Entity("TuttoNutri.Domain.Models.MedicalRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -300,20 +397,86 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.Property<double?>("BodyFat")
                         .HasColumnType("decimal(4,2)");
 
-                    b.Property<Guid>("ConsultationId")
+                    b.Property<double?>("CircAbdomen")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircAntebraco")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircBracoContraido")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircBracoRelaxado")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircCintura")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircCoxaProximal")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircPanturrilha")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircPescoco")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircQuadril")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("CircTorax")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<Guid?>("ConsultationId")
                         .HasColumnType("uuid");
+
+                    b.Property<double?>("DiamFemur")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DiamPunho")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DiamUmero")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraAbdominal")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraAxilarMedia")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraCoxa")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraPeitoral")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraSubescapular")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraSupraIliaca")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<double?>("DobraTriceps")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("EvaluationDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid?>("FoodPlanId")
                         .HasColumnType("uuid");
 
                     b.Property<double?>("Height")
-                        .HasColumnType("decimal(4,2)");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<double?>("MuscleMass")
                         .HasColumnType("decimal(5,2)");
+
+                    b.Property<Guid>("NutritionistId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Objective")
                         .HasMaxLength(200)
@@ -322,6 +485,14 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.Property<string>("ObservacoesClinicas")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ReferenciaComposicao")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<double?>("Weight")
                         .HasColumnType("decimal(5,2)");
@@ -333,6 +504,10 @@ namespace TuttoNutri.Infrastructure.Migrations
 
                     b.HasIndex("FoodPlanId")
                         .IsUnique();
+
+                    b.HasIndex("NutritionistId");
+
+                    b.HasIndex("PatientId");
 
                     b.ToTable("MedicalRecord", (string)null);
                 });
@@ -348,20 +523,62 @@ namespace TuttoNutri.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<DateTime?>("DataExpiracao")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<string>("PlanoAtivo")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Crn")
+                        .IsUnique();
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Nutritionist", (string)null);
+                });
+
+            modelBuilder.Entity("TuttoNutri.Domain.Models.PasswordResetCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Used")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Code");
+
+                    b.ToTable("PasswordResetCodes", (string)null);
                 });
 
             modelBuilder.Entity("TuttoNutri.Domain.Models.Patient", b =>
@@ -371,11 +588,14 @@ namespace TuttoNutri.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("BirthOfDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("Gender")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<double>("Height")
+                        .HasColumnType("double precision");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -531,13 +751,13 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.HasOne("TuttoNutri.Domain.Models.Nutritionist", "Nutritionist")
                         .WithMany()
                         .HasForeignKey("NutritionistId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("TuttoNutri.Domain.Models.Patient", "Patient")
-                        .WithMany("Consultation")
+                        .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Nutritionist");
@@ -564,22 +784,59 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("TuttoNutri.Domain.Models.Meal", b =>
+                {
+                    b.HasOne("TuttoNutri.Domain.Models.FoodPlan", "FoodPlan")
+                        .WithMany("Meals")
+                        .HasForeignKey("FoodPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FoodPlan");
+                });
+
+            modelBuilder.Entity("TuttoNutri.Domain.Models.MealFoodItem", b =>
+                {
+                    b.HasOne("TuttoNutri.Domain.Models.Meal", "Meal")
+                        .WithMany("Items")
+                        .HasForeignKey("MealId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Meal");
+                });
+
             modelBuilder.Entity("TuttoNutri.Domain.Models.MedicalRecord", b =>
                 {
                     b.HasOne("TuttoNutri.Domain.Models.Consultation", "Consultation")
-                        .WithOne("MedicalRecord")
+                        .WithOne()
                         .HasForeignKey("TuttoNutri.Domain.Models.MedicalRecord", "ConsultationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("TuttoNutri.Domain.Models.FoodPlan", "FoodPlan")
                         .WithOne()
                         .HasForeignKey("TuttoNutri.Domain.Models.MedicalRecord", "FoodPlanId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("TuttoNutri.Domain.Models.Nutritionist", "Nutritionist")
+                        .WithMany()
+                        .HasForeignKey("NutritionistId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TuttoNutri.Domain.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Consultation");
 
                     b.Navigation("FoodPlan");
+
+                    b.Navigation("Nutritionist");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("TuttoNutri.Domain.Models.Nutritionist", b =>
@@ -592,25 +849,39 @@ namespace TuttoNutri.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuttoNutri.Domain.Models.PasswordResetCode", b =>
+                {
+                    b.HasOne("TuttoNutri.Domain.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TuttoNutri.Domain.Models.Patient", b =>
                 {
                     b.HasOne("TuttoNutri.Domain.Models.Nutritionist", "Nutritionist")
-                        .WithMany()
+                        .WithMany("Patients")
                         .HasForeignKey("NutritionistId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Nutritionist");
                 });
 
-            modelBuilder.Entity("TuttoNutri.Domain.Models.Consultation", b =>
+            modelBuilder.Entity("TuttoNutri.Domain.Models.FoodPlan", b =>
                 {
-                    b.Navigation("MedicalRecord");
+                    b.Navigation("Meals");
                 });
 
-            modelBuilder.Entity("TuttoNutri.Domain.Models.Patient", b =>
+            modelBuilder.Entity("TuttoNutri.Domain.Models.Meal", b =>
                 {
-                    b.Navigation("Consultation");
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("TuttoNutri.Domain.Models.Nutritionist", b =>
+                {
+                    b.Navigation("Patients");
                 });
 
             modelBuilder.Entity("TuttoNutri.Domain.Models.User", b =>

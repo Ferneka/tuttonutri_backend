@@ -43,9 +43,9 @@ namespace TuttoNutri.Infrastructure.Repository
             .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public void Update(Address entity)
+        public void Update(Address address)
         {
-            _entity.Update(entity);
+            _entity.Update(address);
         }
     }
 }

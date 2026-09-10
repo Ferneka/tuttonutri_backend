@@ -9,7 +9,7 @@ namespace TuttoNutri.API.Application.Services.FoodPlanService
 {
     public interface IFoodPlanService
     {
-        Task<bool> Add(CreateFoodPlanRequest request);
+        Task<FoodPlanDTO> Add(CreateFoodPlanRequest request); 
         Task<FoodPlanDTO> GetById(Guid id);
         Task<List<FoodPlanDTO>> GetAll();
         Task<bool> Update(UpdateFoodPlanRequest request);

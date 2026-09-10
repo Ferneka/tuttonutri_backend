@@ -12,5 +12,10 @@ namespace TuttoNutri.API.Application.Services.AuthService
     {
         Task<UserDTO> RegisterAsync(CreateUserRequest request);
         Task<UserDTO> LoginAsync(CreateLoginRequest request);
+        Task<bool> ForgotPasswordAsync(ForgotPasswordDTO dto);
+        Task<bool> ValidateCodeAsync(ValidateCodeDTO dto);
+        Task<ResetPasswordResult> ResetPasswordAsync(ResetPasswordDTO dto);
+        Task<bool> VerifyEmailAsync(ValidateCodeDTO dto);
+        Task<bool> ResendVerificationCodeAsync(string email);
     }
 }

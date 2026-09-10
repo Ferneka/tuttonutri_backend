@@ -24,11 +24,15 @@ namespace TuttoNutri.Infrastructure.Data
                 .IsRequired()
                 .HasDefaultValue(true);
 
+            builder.Property(n => n.PlanoAtivo)
+                .HasMaxLength(20);
+
             builder.HasOne(n => n.User)
                 .WithOne(u => u.Nutritionist)
                 .HasForeignKey<Nutritionist>(n => n.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasIndex(n => n.Crn).IsUnique();
             // builder.HasMany(n => n.Patients)
             //     .WithOne(p => p.Nutritionist)
             //     .HasForeignKey(p => p.NutritionistId)

@@ -10,5 +10,6 @@ namespace TuttoNutri.Domain.Core.Interfaces
     {
         Task<List<FoodPlan>> GetAll();
         Task DeactivateAsync(Guid id);
+        void Update(FoodPlan foodPlan, HashSet<Guid> originalMealIds, HashSet<Guid> originalItemIds);
     }
 }

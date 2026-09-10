@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using TuttoNutri.API.Application.Models.DTO;
 using TuttoNutri.API.Application.Models.Request.Register;
 using TuttoNutri.API.Application.Services.AuthService;
 
@@ -43,6 +44,43 @@ namespace TuttoNutri.API.Controllers
             if (result is null) return BadRequest();
 
             return Ok(result);
+        }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO dto)
+        {
+            await _service.ForgotPasswordAsync(dto);
+            return Ok();
+        }
+
+        [HttpPost("validate-code")]
+        public async Task<IActionResult> ValidateCode(ValidateCodeDTO dto)
+        {
+            var isValid = await _service.ValidateCodeAsync(dto);
+            if (!isValid) return BadRequest("Código inválido ou expirado.");
+            return Ok();
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+        {
+            var result = await _service.ResetPasswordAsync(dto);
+            if (!result.Success) return BadRequest(result.Errors);
+            return Ok();
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail(ValidateCodeDTO dto)
+        {
+            var sucesso = await _service.VerifyEmailAsync(dto);
+            if (!sucesso) return BadRequest(new { message = "Código inválido ou expirado." });
+            return Ok();
+        }
+
+        [HttpPost("resend-verification-code")]
+        public async Task<IActionResult> ResendVerificationCode(ResendCodeDTO dto)
+        {
+            await _service.ResendVerificationCodeAsync(dto.Email);
+            return Ok();
         }
     }
 }

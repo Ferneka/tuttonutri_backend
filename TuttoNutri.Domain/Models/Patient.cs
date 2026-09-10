@@ -12,27 +12,29 @@ namespace TuttoNutri.Domain.Models
         public string Phone { get; private set; }
         public string Gender { get; private set; }
         public DateTime BirthOfDate { get; private set; }
-
+        public double Height {get; private set;}
         public Guid NutritionistId { get; private set; }
         public Nutritionist Nutritionist { get; private set; }
 
-        public ICollection<Consultation> Consultation { get; set; }
+       // public ICollection<Consultation> Consultation { get; set; }
 
-        public Patient(string name, string phone, string gender, DateTime birthOfDate, Guid nutritionistId)
+        public Patient(string name, string phone, string gender, DateTime birthOfDate, double height, Guid nutritionistId)
         {
             Name = name;
             Phone = phone;
             Gender = gender;
             BirthOfDate = birthOfDate;
+            Height = height;
             NutritionistId = nutritionistId;
         }
 
-        public void Update(string name, string phone, string gender, DateTime birthOfDate)
+        public void Update(string name, string phone, string gender, DateTime birthOfDate,  double height )
         {
             Name = name;
             Phone = phone;
             Gender = gender;
             BirthOfDate = birthOfDate;
+            Height = height;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace TuttoNutri.Infrastructure.Repository
             //.Include(f => f.Patient).ThenInclude(p => p.Address)
             .Include(f => f.Nutritionist).ThenInclude(n => n.User)
             //.Include(f => f.Nutritionist).ThenInclude(n => n.Address)
+            .Include(f => f.Meals).ThenInclude(m => m.Items) // NOVO
             .Where(f => f.IsActive == true)
             .ToListAsync();
         }
@@ -46,13 +47,49 @@ namespace TuttoNutri.Infrastructure.Repository
             //.Include(f => f.Patient).ThenInclude(p => p.Address)
             .Include(f => f.Nutritionist).ThenInclude(n => n.User)
             //.Include(f => f.Nutritionist).ThenInclude(n => n.Address)
+            .Include(f => f.Meals).ThenInclude(m => m.Items) // NOVO — essencial: sem isso o Update() não enxerga as refeições antigas pra substituir
             .Where(f => f.IsActive == true)
             .FirstOrDefaultAsync(f => f.Id == id);
         }
 
-        public void Update(FoodPlan entity)
+        public void Update(FoodPlan entity, HashSet<Guid> originalMealIds, HashSet<Guid> originalItemIds)
         {
-            _entity.Update(entity);
-        }
-    }
+        
+            _context.Entry(entity).State = EntityState.Modified;
+
+            var currentMealIds = entity.Meals.Select(m => m.Id).ToHashSet();
+
+            // Refeições que existiam antes e sumiram -> deletar
+            foreach (var oldId in originalMealIds.Except(currentMealIds))
+            {
+                var meal = _context.ChangeTracker.Entries<Meal>()
+                    .FirstOrDefault(e => e.Entity.Id == oldId)?.Entity;
+                if (meal != null) _context.Entry(meal).State = EntityState.Deleted;
+            }
+
+            foreach (var meal in entity.Meals)
+            {
+                // não existia antes -> força Added, ignorando o que o EF decidiu sozinho
+                if (!originalMealIds.Contains(meal.Id))
+                    _context.Entry(meal).State = EntityState.Added;
+
+                var currentItemIds = meal.Items.Select(i => i.Id).ToHashSet();
+
+                foreach (var item in meal.Items)
+                {
+                    if (!originalItemIds.Contains(item.Id))
+                        _context.Entry(item).State = EntityState.Added;
+                }
+            }
+
+            var allCurrentItemIds = entity.Meals.SelectMany(m => m.Items).Select(i => i.Id).ToHashSet();
+            foreach (var oldItemId in originalItemIds.Except(allCurrentItemIds))
+            {
+                var item = _context.ChangeTracker.Entries<MealFoodItem>()
+                    .FirstOrDefault(e => e.Entity.Id == oldItemId)?.Entity;
+                if (item != null) _context.Entry(item).State = EntityState.Deleted;
+            }
+                    }
+                }
 }
+

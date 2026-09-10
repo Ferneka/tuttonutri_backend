@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuttoNutri.API.Application.Models.Request.PatientRequest;
 using TuttoNutri.API.Application.Services.PatientService;
+using TuttoNutri.API.Filters;
 
 namespace TuttoNutri.API.Controllers
 {
     [Authorize(Roles = "Nutritionist")]
+    [RequireActiveSubscription]
     public class PatientController : DefaultController
     {
         private readonly IPatientService _service;
@@ -46,7 +48,7 @@ namespace TuttoNutri.API.Controllers
 
             return Ok(result);
         }
-
+        
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -54,12 +56,10 @@ namespace TuttoNutri.API.Controllers
         {
             var data = await _service.GetAll(GetNutritionistId());
 
-            if (data.Any() is false) return NoContent();
-
             return Ok(data);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Update(UpdatePatientRequest request)
@@ -77,6 +77,18 @@ namespace TuttoNutri.API.Controllers
         public async Task<IActionResult> Deactivate(Guid id)
         {
             var result = await _service.Deactivate(id, GetNutritionistId());
+
+            if (result is false) return BadRequest();
+
+            return Ok(result);
+        }
+        
+        [HttpPatch("{id}/activate")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Activate(Guid id)
+        {
+            var result = await _service.Activate(id, GetNutritionistId());
 
             if (result is false) return BadRequest();
 

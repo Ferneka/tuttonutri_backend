@@ -15,6 +15,15 @@ namespace TuttoNutri.Infrastructure.Repository
         private readonly DbSet<Patient> _entity = context.Set<Patient>();
         public IUnitOfWork UnitOfWork => unitOfWork;
 
+        public async Task<bool> Activate(Guid id)
+        {
+            var patient = await _entity.FindAsync(id);
+            if (patient == null) return false;
+
+            patient.IsActive = true;
+            return true;
+        }
+
         public void Add(Patient entity)
         {
             _entity.Add(entity);
@@ -33,22 +42,18 @@ namespace TuttoNutri.Infrastructure.Repository
         public async Task<List<Patient>> GetAll()
         {
             return await _entity
-            //.Include(a => a.Address)
-            .Where(a => a.IsActive == true)
             .ToListAsync();
         }
 
         public async Task<Patient> GetById(Guid id)
         {
              return await _entity
-            //.Include(a => a.Address)
-            .Where(a => a.IsActive == true)
             .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public void Update(Patient entity)
+        public void Update(Patient patient)
         {
-            _entity.Update(entity);
+            _entity.Update(patient);
         }
     }
 }

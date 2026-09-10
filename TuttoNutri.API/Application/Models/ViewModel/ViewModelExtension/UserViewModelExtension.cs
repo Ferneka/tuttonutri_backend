@@ -14,9 +14,7 @@ namespace TuttoNutri.API.Application.Models.ViewModel.ViewModelExtension
             {
                 Id = DTO.Id,
                 Name = DTO.Name,
-                Gender  = DTO.Gender,
                 Email = DTO.Email,
-                BirthOfDate = DTO.BirthOfDate
             };
         }
     }

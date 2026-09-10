@@ -39,6 +39,11 @@ namespace TuttoNutri.Infrastructure.Repository
             .ToListAsync();
         }
 
+        public async Task<Nutritionist> GetByCrn(string crn)
+        {
+            return await _context.Nutritionist.FirstOrDefaultAsync(n => n.Crn == crn);
+        }
+
         public async Task<Nutritionist> GetById(Guid id)
         {
             return await _entity
@@ -53,9 +58,9 @@ namespace TuttoNutri.Infrastructure.Repository
             return await _entity.FirstOrDefaultAsync(n => n.UserId == userId);
         }
 
-        public void Update(Nutritionist entity)
+        public void Update(Nutritionist nutritionist)
         {
-            _entity.Update(entity);
+            _entity.Update(nutritionist);
         }
     }
 }

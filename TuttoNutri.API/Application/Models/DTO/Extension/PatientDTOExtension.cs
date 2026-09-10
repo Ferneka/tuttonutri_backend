@@ -18,7 +18,8 @@ namespace TuttoNutri.API.Application.Models.DTO.Extension
                 Name = patient.Name,
                 Phone = patient.Phone,
                 Gender = patient.Gender,
-                BirthOfDate = patient.BirthOfDate,                
+                BirthOfDate = patient.BirthOfDate,   
+                Height = patient.Height,             
                 IsActive = patient.IsActive,
             };
         }

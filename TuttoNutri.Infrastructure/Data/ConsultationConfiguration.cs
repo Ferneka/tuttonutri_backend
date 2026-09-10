@@ -17,31 +17,26 @@ namespace TuttoNutri.Infrastructure.Data
             builder.HasKey(c => c.Id);
 
             builder.Property(c => c.Date)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("timestamp without time zone");
+
 
             builder.Property(c => c.Status)
                 .IsRequired()
-                .HasMaxLength(50);
-
-            builder.Property(c => c.Observations)
-                .HasMaxLength(500);
-
-            builder.Property(c => c.MinuteDuration)
-                .IsRequired();
+                .HasConversion<string>()
+                .HasMaxLength(20);
 
             builder.Property(c => c.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
 
-            builder.HasOne(c => c.Patient)
-                .WithMany(p => p.Consultation)
-                .HasForeignKey(c => c.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // builder.HasOne(c => c.Nutritionist)
-            //     .WithMany(n => n.Consultation)
-            //     .HasForeignKey(c => c.NutritionistId)
-            //     .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(c => c.Nutritionist)
+                .WithMany()
+                .HasForeignKey(c => c.NutritionistId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
+            
+         
         }
     }
 }

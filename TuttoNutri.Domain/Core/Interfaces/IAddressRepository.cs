@@ -10,5 +10,6 @@ namespace TuttoNutri.Domain.Core.Interfaces
     {
         Task<List<Address>> GetAll();
         Task DeactivateAsync(Guid id);
+        void Update(Address address);
     }
 }

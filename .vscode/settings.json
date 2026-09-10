@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/1604ff69-0db8-4445-904c-53b5f770ef26/resourceGroups/tuttoNutriBackEnd/providers/Microsoft.Web/sites/tuttonutri-api",
+    "appService.deploySubpath": "TuttoNutri.API\\publish"
+}

@@ -8,7 +8,6 @@ namespace TuttoNutri.Domain.Core.Interfaces
     {
         void Add(TEntity entity);
         IUnitOfWork UnitOfWork { get; }
-        void Update(TEntity entity);
         Task<TEntity> GetById(TKey id);
     }
 }
