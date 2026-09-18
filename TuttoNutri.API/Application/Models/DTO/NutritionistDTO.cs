@@ -8,9 +8,12 @@ namespace TuttoNutri.API.Application.Models.DTO
 {
     public class NutritionistDTO
     {
-        public Guid Id {get; set;}
-        public UserSummaryDTO User {get; set;}
-        public string Crn { get; set; }          
-        public bool IsActive {get; set;}
+        public Guid Id { get; set; }
+        public UserSummaryDTO User { get; set; }
+        public string Crn { get; set; }
+        public string Cpf { get; set; }
+        public string Phone { get; set; }
+        public DateTime? BirthOfDate { get; set; }
+        public bool IsActive { get; set; }
     }
 }

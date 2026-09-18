@@ -10,26 +10,27 @@ namespace TuttoNutri.Domain.Models
     {
         public string UserId { get; private set; }
         public User User { get; private set; }
-        public string Crn { get; private set; }    
-        public ICollection<Patient> Patients { get; set; }  
+        public string Crn { get; private set; }
+        public ICollection<Patient> Patients { get; set; }
         public string PlanoAtivo { get; set; }
-        public DateTime? DataExpiracao { get; set; }    
+        public DateTime? DataExpiracao { get; set; }
+        public string Cpf { get; private set; }
+        public string Phone { get; private set; }
+        public DateTime? BirthOfDate { get; private set; }
 
-                public Nutritionist(string userId, string crn)
+        public Nutritionist(string userId, string crn)
         {
             UserId = userId;
             Crn = crn;
             PlanoAtivo = "Trial";
             DataExpiracao = DateTime.UtcNow.AddMonths(1);
         }
-        public void Update(Guid userId, string crn)
+
+        public void UpdateContactInfo(string cpf, string phone, DateTime? birthOfDate)
         {
-            UserId = userId.ToString();
-            Crn = crn;
+            Cpf = cpf;
+            Phone = phone;
+            BirthOfDate = birthOfDate;
         }
-        // public void SetAddress(Guid addressId)
-        // {
-        //     AddressId = addressId;
-        // }
     }
 }

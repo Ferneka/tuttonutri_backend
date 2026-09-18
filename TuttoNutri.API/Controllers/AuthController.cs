@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using TuttoNutri.API.Application.Models.DTO;
 using TuttoNutri.API.Application.Models.Request.Register;
 using TuttoNutri.API.Application.Services.AuthService;
+using TuttoNutri.API.Application.Exceptions;
+using System.Security.Claims;
 
 namespace TuttoNutri.API.Controllers
 {
@@ -39,11 +41,22 @@ namespace TuttoNutri.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Login(CreateLoginRequest request)
         {
-            var result = await _service.LoginAsync(request);
+            try
+            {
+                var result = await _service.LoginAsync(request);
 
-            if (result is null) return BadRequest();
+                if (result is null) return BadRequest();
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (EmailNotConfirmedException)
+            {
+                return StatusCode((int)HttpStatusCode.Forbidden, new
+                {
+                    code = EmailNotConfirmedException.CodeValue,
+                    email = request.Email
+                });
+            }
         }
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO dto)
@@ -71,9 +84,9 @@ namespace TuttoNutri.API.Controllers
         [HttpPost("verify-email")]
         public async Task<IActionResult> VerifyEmail(ValidateCodeDTO dto)
         {
-            var sucesso = await _service.VerifyEmailAsync(dto);
-            if (!sucesso) return BadRequest(new { message = "Código inválido ou expirado." });
-            return Ok();
+            var result = await _service.VerifyEmailAsync(dto);
+            if (result is null) return BadRequest(new { message = "Código inválido ou expirado." });
+            return Ok(result);
         }
 
         [HttpPost("resend-verification-code")]
@@ -82,5 +95,6 @@ namespace TuttoNutri.API.Controllers
             await _service.ResendVerificationCodeAsync(dto.Email);
             return Ok();
         }
+       
     }
 }

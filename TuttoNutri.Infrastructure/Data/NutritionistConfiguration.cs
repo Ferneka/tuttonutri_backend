@@ -26,6 +26,13 @@ namespace TuttoNutri.Infrastructure.Data
 
             builder.Property(n => n.PlanoAtivo)
                 .HasMaxLength(20);
+            
+            builder.Property(n => n.Cpf)
+                .HasMaxLength(14); 
+
+            builder.Property(n => n.Phone)
+                .HasMaxLength(20);
+           
 
             builder.HasOne(n => n.User)
                 .WithOne(u => u.Nutritionist)
@@ -33,6 +40,9 @@ namespace TuttoNutri.Infrastructure.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(n => n.Crn).IsUnique();
+
+            // builder.HasIndex(n => n.Cpf ).IsUnique();
+
             // builder.HasMany(n => n.Patients)
             //     .WithOne(p => p.Nutritionist)
             //     .HasForeignKey(p => p.NutritionistId)

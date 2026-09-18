@@ -26,6 +26,7 @@ namespace TuttoNutri.API.Application.Models.DTO.Extension
                 EndDate = foodPlan.EndDate,
                 Nutritionist = foodPlan.Nutritionist?.ToDTO(),
                 PatientId = foodPlan.PatientId, 
+                IsActive = foodPlan.IsActive,
                 Meals = foodPlan.Meals.Select(m => new MealDTO 
                 {
                     Id = m.Id,

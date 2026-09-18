@@ -10,5 +10,8 @@ namespace TuttoNutri.API.Application.Models.Request.Register
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
         public string Crn { get; set; }
+        public string Cpf { get; set; }
+        public string Phone { get; set; }
+        public DateTime? BirthOfDate { get; set; }
     }
 }

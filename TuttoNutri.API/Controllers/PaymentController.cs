@@ -29,11 +29,18 @@ namespace TuttoNutri.API.Controllers
             _nutritionistRepository = nutritionistRepository;
         }
 
+        private Guid GetNutritionistId()
+        {
+            var claim = User.FindFirst("NutritionistId")?.Value;
+            return Guid.Parse(claim);
+        }
         [Authorize(Roles = "Nutritionist")]
         [HttpPost("card")]
         public async Task<IActionResult> PayWithCard([FromBody] CardPaymentDTO dto)
         {
+            var nutricionistaId = GetNutritionistId();
             var client = CreateMpClient();
+            client.DefaultRequestHeaders.Add("X-Idempotency-Key", Guid.NewGuid().ToString());
 
             var body = new
             {
@@ -42,7 +49,7 @@ namespace TuttoNutri.API.Controllers
                 description = $"Assinatura TuttoNutri - {dto.Plano}",
                 installments = 1,
                 payment_method_id = dto.PaymentMethodId,
-                external_reference = dto.NutricionistaId,
+                external_reference = nutricionistaId.ToString(),
                 payer = new { email = dto.Email }
             };
 
@@ -51,24 +58,25 @@ namespace TuttoNutri.API.Controllers
 
             var result = await response.Content.ReadFromJsonAsync<MpPaymentResponse>();
 
-            if (result.Status == "approved")
-                await AtivarAssinaturaAsync(dto.NutricionistaId, dto.Plano);
+            if (result?.Status == "approved")
+                await AtivarAssinaturaAsync(nutricionistaId, dto.Plano);
 
             return Ok(result);
         }
-
         [Authorize(Roles = "Nutritionist")]
         [HttpPost("pix")]
         public async Task<IActionResult> PayWithPix([FromBody] PixPaymentDTO dto)
         {
+            var nutricionistaId = GetNutritionistId();
             var client = CreateMpClient();
+            client.DefaultRequestHeaders.Add("X-Idempotency-Key", Guid.NewGuid().ToString());
 
             var body = new
             {
                 transaction_amount = dto.Amount,
                 description = $"Assinatura TuttoNutri - {dto.Plano}",
                 payment_method_id = "pix",
-                external_reference = dto.NutricionistaId,
+                external_reference = nutricionistaId.ToString(),
                 payer = new { email = dto.Email, first_name = dto.Nome }
             };
 
@@ -79,9 +87,9 @@ namespace TuttoNutri.API.Controllers
 
             return Ok(new
             {
-                paymentId = result.Id,
-                qrCodeBase64 = result.PointOfInteraction?.TransactionData?.QrCodeBase64,
-                copiaCola = result.PointOfInteraction?.TransactionData?.QrCode
+                paymentId = result?.Id,
+                qrCodeBase64 = result?.PointOfInteraction?.TransactionData?.QrCodeBase64,
+                copiaCola = result?.PointOfInteraction?.TransactionData?.QrCode
             });
         }
 
@@ -138,6 +146,4 @@ namespace TuttoNutri.API.Controllers
             await _unitOfWork.SaveChangesAsync();
         }
     }
-
-   
 }

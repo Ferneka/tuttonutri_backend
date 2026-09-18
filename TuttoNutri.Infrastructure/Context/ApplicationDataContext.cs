@@ -22,6 +22,7 @@ namespace TuttoNutri.Infrastructure.Context
         public DbSet<EmailVerificationCode> EmailVerificationCodes { get; set; }
         public DbSet<Meal> Meal {get; set;}
         public DbSet<MealFoodItem> MealFoodItem {get; set;}
+        public DbSet<EmailChangeRequest> EmailChangeRequests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDataContext).Assembly);

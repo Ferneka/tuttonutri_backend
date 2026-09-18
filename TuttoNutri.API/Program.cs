@@ -132,6 +132,7 @@ builder.Services.AddScoped<IConsultationService, ConsultationService>();
 builder.Services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddSingleton<TacoDataProvider>();
+builder.Services.AddScoped<IEmailChangeRequestRepository, EmailChangeRequestRepository>();
 
 var app = builder.Build();
 

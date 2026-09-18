@@ -17,6 +17,8 @@ namespace TuttoNutri.API.Application.Models.DTO.Extension
                 Id = nutritionist.Id,  
                 User = nutritionist.User.ToSummaryDTO(),
                 Crn = nutritionist.Crn,
+                Cpf = nutritionist.Cpf,
+                Phone = nutritionist.Phone,
                 IsActive = nutritionist.IsActive,
             };
         }

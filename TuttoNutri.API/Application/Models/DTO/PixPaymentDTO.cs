@@ -11,6 +11,5 @@ namespace TuttoNutri.API.Application.Models.DTO
         public string Plano { get; set; }
         public string Email { get; set; }
         public string Nome { get; set; }
-        public string NutricionistaId { get; set; }
     }
 }

@@ -27,11 +27,12 @@ namespace TuttoNutri.API.Application.Services.AuthService
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly IEmailVerificationCodeRepository _verificationCodeRepository;
+        private readonly IEmailChangeRequestRepository _emailChangeRequestRepository;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService(IAuthRepository authRepository, IAddressRepository addressRepository, INutritionistRepository nutritionistRepository,
          ITokenService tokenService, IPasswordResetCodeRepository resetCodeRepository, UserManager<User> userManager, IEmailService emailService,
-         IUnitOfWork unitOfWork, IEmailVerificationCodeRepository verificationCodeRepository, ILogger<AuthService> logger)
+         IUnitOfWork unitOfWork, IEmailVerificationCodeRepository verificationCodeRepository,IEmailChangeRequestRepository emailChangeRequestRepository, ILogger<AuthService> logger)
         {
             _authRepository = authRepository;
             _addressRepository = addressRepository;
@@ -42,7 +43,32 @@ namespace TuttoNutri.API.Application.Services.AuthService
             _emailService = emailService;
             _unitOfWork = unitOfWork;
             _verificationCodeRepository = verificationCodeRepository;
+            _emailChangeRequestRepository = emailChangeRequestRepository;
             _logger = logger;
+        }
+
+        public async Task<bool> ConfirmEmailChangeAsync(string userId, string code)
+        {
+            var record = await _emailChangeRequestRepository.GetValidAsync(userId, code);
+
+            if (record == null || record.ExpiresAt < DateTime.UtcNow || record.Used)
+                return false;
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.Email = record.NewEmail;
+            user.NormalizedEmail = record.NewEmail.ToUpperInvariant();
+            user.UserName = record.NewEmail;
+            user.NormalizedUserName = record.NewEmail.ToUpperInvariant();
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return false;
+
+            record.Used = true;
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> ForgotPasswordAsync(ForgotPasswordDTO dto)
@@ -85,6 +111,9 @@ namespace TuttoNutri.API.Application.Services.AuthService
             var senhaValida = await _authRepository.CheckPasswordAsync(user, request.Password);
             if (!senhaValida)
                 return null;
+
+            if (!user.EmailConfirmed)
+                throw new EmailNotConfirmedException();
 
             var roles = await _authRepository.GetRolesAsync(user);
             var role = roles.FirstOrDefault();
@@ -129,7 +158,10 @@ namespace TuttoNutri.API.Application.Services.AuthService
             var nutritionist = new Nutritionist(
                 userId: user.Id,
                 crn: request.Crn
+                
             );
+            nutritionist.UpdateContactInfo(request.Cpf, request.Phone, request.BirthOfDate);
+
             _nutritionistRepository.Add(nutritionist);
             await _nutritionistRepository.UnitOfWork.SaveEntitiesAsync();
 
@@ -143,10 +175,6 @@ namespace TuttoNutri.API.Application.Services.AuthService
             });
             await _unitOfWork.SaveChangesAsync();
 
-            // Gera o token ANTES de tentar enviar o e-mail, para que o cadastro
-            // seja concluído com sucesso mesmo que o envio de e-mail falhe.
-            var token = _tokenService.GenerateToken(user, "Nutritionist", nutritionist.Id);
-
             try
             {
                 await _emailService.SendAsync(user.Email, "Verifique seu e-mail",
@@ -159,6 +187,9 @@ namespace TuttoNutri.API.Application.Services.AuthService
                 // o front pode oferecer "reenviar código" depois.
             }
 
+            // Sem token aqui: o usuário só recebe acesso depois de confirmar o
+            // e-mail em VerifyEmailAsync. Isso evita que uma queda de conexão
+            // no meio do cadastro deixe alguém "logado" sem ter verificado nada.
             return new UserDTO
             {
                 Id = user.Id,
@@ -166,8 +197,41 @@ namespace TuttoNutri.API.Application.Services.AuthService
                 Email = user.Email,
                 Role = "Nutritionist",
                 NutritionistId = nutritionist.Id,
-                Token = token
+                Token = null
             };
+        }
+
+        public async Task<bool> RequestEmailChangeAsync(string userId, string newEmail)
+        {
+            var existingUser = await _userManager.FindByEmailAsync(newEmail);
+            if (existingUser != null)
+                throw new BusinessException("Já existe uma conta usando esse e-mail.");
+
+            var code = new Random().Next(100000, 999999).ToString();
+
+            await _emailChangeRequestRepository.AddAsync(new EmailChangeRequest
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                NewEmail = newEmail,
+                Code = code,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                Used = false
+            });
+
+            await _unitOfWork.SaveChangesAsync();
+
+            try
+            {
+                await _emailService.SendAsync(newEmail, "Confirme seu novo e-mail",
+                    $"Seu código de confirmação é: {code}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Falha ao enviar código de troca de e-mail para {Email}", newEmail);
+            }
+
+            return true;
         }
 
         public async Task<bool> ResendVerificationCodeAsync(string email)
@@ -233,15 +297,15 @@ namespace TuttoNutri.API.Application.Services.AuthService
             return true;
         }
 
-        public async Task<bool> VerifyEmailAsync(ValidateCodeDTO dto)
+        public async Task<UserDTO> VerifyEmailAsync(ValidateCodeDTO dto)
         {
             var record = await _verificationCodeRepository.GetValidAsync(dto.Email, dto.Code);
 
             if (record == null || record.ExpiresAt < DateTime.UtcNow || record.Used)
-                return false;
+                return null;
 
             var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null) return false;
+            if (user == null) return null;
 
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
@@ -249,7 +313,20 @@ namespace TuttoNutri.API.Application.Services.AuthService
             record.Used = true;
             await _unitOfWork.SaveChangesAsync();
 
-            return true;
+            var roles = await _authRepository.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+            var nutritionist = await _nutritionistRepository.GetByUserId(user.Id);
+            var token = _tokenService.GenerateToken(user, role, nutritionist?.Id);
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = role,
+                NutritionistId = nutritionist?.Id,
+                Token = token
+            };
         }
     }
 }

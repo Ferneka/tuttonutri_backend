@@ -7,12 +7,10 @@ namespace TuttoNutri.API.Application.Models.Request.NutritionistRequest
 {
     public class UpdateNutritionistRequest
     {
-        public Guid Id {get; set;}
-        public Guid UserId {get; set;}
-        public string Crn { get; set; }          
-        public string Especialidade { get; set; } 
-        public Guid AddressId { get; set; }
-        public bool IsActive {get; set;}
+         public Guid Id { get; set; }
+        public string Cpf { get; set; }
+        public string Phone { get; set; }
+        public DateTime? BirthOfDate { get; set; }
 
     }
 }

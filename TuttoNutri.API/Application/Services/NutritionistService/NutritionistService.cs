@@ -49,12 +49,7 @@ namespace TuttoNutri.API.Application.Services.NutritionistService
 
             if (nutritionist is null) return false;
 
-            // nutritionist.Update(
-            //     request.UserId,
-            //     request.Crn,
-            //     request.Especialidade,
-            //     request.AddressId
-            // );
+            nutritionist.UpdateContactInfo(request.Cpf, request.Phone, request.BirthOfDate);
 
             return await _repository.UnitOfWork.SaveEntitiesAsync();
         }
